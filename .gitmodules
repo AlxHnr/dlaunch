@@ -1,0 +1,3 @@
+[submodule "chicken-builder"]
+	path = chicken-builder
+	url = https://github.com/AlxHnr/chicken-builder
