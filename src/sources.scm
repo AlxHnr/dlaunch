@@ -44,15 +44,19 @@
   ;; optional key values as described above in 'source-info'.
   (define (register-source name thunk #!key async once)
     (cond
-      ((hash-table-exists? source-table name)
+      ((string-index name #\>)
        (error
          (string-append
-           "multiple sources with the same name are forbidden: '"
-           name "'.")))
-      (else
-        (hash-table-set!
-          source-table name
-          (make-source-info thunk async once)))))
+           "source name cannot contain '>': '" name "'.")))
+       ((hash-table-exists? source-table name)
+        (error
+          (string-append
+            "multiple sources with the same name are forbidden: '"
+            name "'.")))
+       (else
+         (hash-table-set!
+           source-table name
+           (make-source-info thunk async once)))))
 
   ;; Checks if a source was registered.
   (define (source-exists? name)
@@ -125,7 +129,8 @@
   ;; valid, existing source names as an optional argument. If it is omitted
   ;; or null, it will return the contents of all available sources.
   (define (gather-sources #!optional (source-list '()))
-    (define invalid-source (find (complement source-exists?) lst))
+    (define invalid-source
+      (find (complement source-exists?) source-list))
     (when invalid-source
       (error
         (string-append "source does not exist: '" invalid-source "'")))
