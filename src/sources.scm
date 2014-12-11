@@ -125,6 +125,10 @@
   ;; valid, existing source names as an optional argument. If it is omitted
   ;; or null, it will return the contents of all available sources.
   (define (gather-sources #!optional (source-list '()))
+    (define invalid-source (find (complement source-exists?) lst))
+    (when invalid-source
+      (error
+        (string-append "source does not exist: '" invalid-source "'")))
     (fold
       (lambda (source-name lst)
         (merge
@@ -135,4 +139,12 @@
       '()
       (if (null? source-list)
         (map car (hash-table->alist source-table))
-        source-list))))
+        ; Deduplicate source list.
+        (let ((sorted-list (sort source-list string<?)))
+          (fold
+            (lambda (name lst)
+              (if (string=? name (car lst))
+                lst
+                (cons name lst)))
+            (list (car sorted-list))
+            (cdr sorted-list)))))))
