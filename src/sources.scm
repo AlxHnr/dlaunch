@@ -44,10 +44,10 @@
   ;; optional key values as described above in 'source-info'.
   (define (register-source name thunk #!key async once)
     (cond
-      ((string-index name #\>)
+      ((substring-index name ">  ")
        (error
          (string-append
-           "source name cannot contain '>': '" name "'.")))
+           "source name cannot contain the '>  ' separator: '" name "'.")))
        ((hash-table-exists? source-table name)
         (error
           (string-append
