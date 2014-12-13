@@ -66,8 +66,8 @@
   (define (compile-scheme-file plugin-name source-file output-file)
     (compile-file
       source-file
-      #:options (list "-O3" "-dynamic" "-unit" plugin-name)
-      #:output-file output-file #:load #f))
+      options: (list "-O3" "-dynamic" "-unit" plugin-name)
+      output-file: output-file load: #f))
 
   ;; Checks if the source file for the given plugin has changed and
   ;; rebuilds the corresponding dynamic library. If the dynamic library

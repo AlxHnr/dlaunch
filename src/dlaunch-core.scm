@@ -29,7 +29,7 @@
   ;; Custom arguments specified by the user in dlaunch's config files.
   (define dmenu-user-args
     (if (file-exists? (get-config-path "dmenu-args.scm"))
-      (car (read-file (get-config-path "dmenu-args.scm")))
+      (read-file (get-config-path "dmenu-args.scm"))
       '()))
 
   ;; Builds a list with dlaunch specific command line arguments for dmenu.
@@ -66,7 +66,8 @@
           (lambda (str)
             (write-line str out))
           lst))
-      extra-args: (get-dlaunch-args lst) dmenu-args: dmenu-args))
+      extra-args: (get-dlaunch-args lst)
+      dmenu-args: dmenu-args))
 
   ;; Prompts the user to select a string from the specified sources and
   ;; returns it as a pair, with its source name as the cdr. If the users
