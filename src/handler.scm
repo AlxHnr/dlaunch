@@ -19,6 +19,21 @@
 ;    3. This notice may not be removed or altered from any source
 ;       distribution.
 
-(module dlaunch-plugin-api ()
-  (import chicken)
-  (reexport dlaunch-core sources base-directories handler))
+(chb-module handler (register-handler apply-handler)
+  (use srfi-69)
+
+  ;; A list, containing all handler procedures.
+  (define handler-procs '())
+
+  ;; Registers a handler. A handler is a procedure, which takes two
+  ;; arguments. The first argument is the users input string. The second
+  ;; argument is either the name of its source or #f.
+  (define (register-handler proc)
+    (set! handler-procs (cons proc handler-procs)))
+
+  ;; Applies all available handler to the given source pair.
+  (define (apply-handler selected-string source-name)
+    (for-each
+      (lambda (proc)
+        (proc selected-string source-name))
+      handler-procs)))

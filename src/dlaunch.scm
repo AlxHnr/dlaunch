@@ -20,7 +20,7 @@
 ;       distribution.
 
 (chb-program
-  (chb-import dlaunch-core plugin-loader)
+  (chb-import dlaunch-core plugin-loader handler)
   (use data-structures srfi-1 srfi-13)
 
   (define (print-help)
@@ -58,6 +58,11 @@
 
   (compile-changed-plugins)
   (load-plugins)
-  (dlaunch
-    sources: specified-sources
-    dmenu-args: dmenu-args))
+  (define user-selection
+    (dlaunch
+      sources: specified-sources
+      dmenu-args: dmenu-args))
+  (if user-selection
+    (apply-handler
+      (car user-selection)
+      (cdr user-selection))))

@@ -69,9 +69,13 @@
       extra-args: (get-dlaunch-args lst) dmenu-args: dmenu-args))
 
   ;; Prompts the user to select a string from the specified sources and
-  ;; returns it on success. If no, or an empty list of sources was
-  ;; specified, it uses all available sources. This function takes an
-  ;; optional list of arguments for dmenu.
+  ;; returns it as a pair, with its source name as the cdr. If the users
+  ;; input string does not exist in any source, the sources name will be
+  ;; #f. If the user aborts his selection, #f will be returned. This
+  ;; function takes a list of source names as a key parameter, to specify
+  ;; the sources which should be searched. If the source list is omitted or
+  ;; null, it will search trough all available sources. This function also
+  ;; takes an optional list of arguments for dmenu as a key parameter.
   (define (dlaunch #!key (sources '()) (dmenu-args '()))
     (define source-contents (gather-sources sources))
     (define selected-string
