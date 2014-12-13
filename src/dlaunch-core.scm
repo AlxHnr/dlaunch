@@ -79,9 +79,9 @@
         (lambda (out)
           (for-each
             (lambda (item-pair)
-              (write-string (cdr item-pair) #f out)
-              (write-string ">  " #f out)
-              (write-line (car item-pair) out))
+              (write-line
+                (string-append (cdr item-pair) ">  " (car item-pair))
+                out))
             source-contents))
         extra-args: (get-dlaunch-args source-contents)
         dmenu-args: dmenu-args))
