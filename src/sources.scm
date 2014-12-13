@@ -20,7 +20,7 @@
 ;       distribution.
 
 (chb-module sources (register-source source-exists? gather-sources)
-  (chb-import base-directories)
+  (chb-import base-directories misc)
   (use extras files posix data-structures srfi-1 srfi-69)
 
   ; Associates source names with its informations.
@@ -45,18 +45,14 @@
   (define (register-source name thunk #!key async once)
     (cond
       ((substring-index name ">  ")
-       (error
-         (string-append
-           "source name cannot contain the '>  ' separator: '" name "'.")))
-       ((hash-table-exists? source-table name)
-        (error
-          (string-append
-            "multiple sources with the same name are forbidden: '"
-            name "'.")))
-       (else
-         (hash-table-set!
-           source-table name
-           (make-source-info thunk async once)))))
+       (die "source name cannot contain the '>  ' separator: '" name "'."))
+      ((hash-table-exists? source-table name)
+       (die
+         "multiple sources with the same name are forbidden: '" name "'."))
+      (else
+        (hash-table-set!
+          source-table name
+          (make-source-info thunk async once)))))
 
   ;; Checks if a source was registered.
   (define (source-exists? name)
@@ -131,9 +127,8 @@
   (define (gather-sources #!optional (source-list '()))
     (define invalid-source
       (find (complement source-exists?) source-list))
-    (when invalid-source
-      (error
-        (string-append "source does not exist: '" invalid-source "'")))
+    (if invalid-source
+      (die "source does not exist: '" invalid-source "'"))
     (fold
       (lambda (source-name lst)
         (merge

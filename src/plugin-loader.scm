@@ -20,7 +20,7 @@
 ;       distribution.
 
 (chb-module plugin-loader (compile-changed-plugins load-plugins)
-  (chb-import base-directories)
+  (chb-import base-directories misc)
   (use utils files extras posix srfi-1 srfi-13 srfi-69)
 
   ;; A hash table, which contains the names of all loaded plugins.
@@ -77,13 +77,10 @@
     (define curr-time (vector-ref (file-stat source-file) 8))
     (define prev-time (hash-table-ref/default build-data plugin-name 0))
     (unless (and (file-exists? output-file) (= prev-time curr-time))
+      (print "compiling plugin: " plugin-name " ...")
       (if (compile-scheme-file plugin-name source-file output-file)
-        (begin
-          (print "compiled plugin '" plugin-name "'.")
-          (hash-table-set! build-data plugin-name curr-time))
-        (error
-          (string-append
-            "failed to compile the plugin '" plugin-name "'.")))))
+        (hash-table-set! build-data plugin-name curr-time)
+        (die "failed to compile plugin: " plugin-name))))
 
   ;; Compiles all plugins, which either don't exist or have been modified
   ;; since their last compilation.
@@ -100,7 +97,7 @@
     (unless (hash-table-exists? loaded-plugins plugin-name)
       (load-library (string->symbol plugin-name) output-file)
       (hash-table-set! loaded-plugins plugin-name #t)
-      (print "loaded '" output-file "'.")))
+      (print "loaded plugin: " plugin-name)))
 
   ;; Loads all plugins, which where not loaded already.
   (define (load-plugins)
