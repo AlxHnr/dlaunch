@@ -102,6 +102,7 @@
                   name (source-info-thunk info) #f)))
             cache-data)
           (begin
+            (print "initializing cache for the source '" name "' ...")
             (synced-cache-update name (source-info-thunk info) #t)
             (read-lines cache-file))))
       ((source-info-thunk info))))
