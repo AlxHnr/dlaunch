@@ -23,7 +23,7 @@
 
 (chb-module dlaunch-core
   (dlaunch dlaunch-from-list call-with-dmenu-output-pipe)
-  (chb-import base-directories sources)
+  (chb-import base-directories sources ranking)
   (use extras posix data-structures srfi-1)
 
   ;; Custom arguments specified by the user in dlaunch's config files.
@@ -77,6 +77,7 @@
   ;; the sources which should be searched. If the source list is omitted or
   ;; null, it will search trough all available sources. This function also
   ;; takes an optional list of arguments for dmenu as a key parameter.
+  ;; It uses the ranking module for learning.
   (define (dlaunch #!key (sources '()) (dmenu-args '()))
     (define source-contents (gather-sources sources))
     (define selected-string
@@ -93,8 +94,12 @@
     (if selected-string
       (let ((seperator-index (substring-index ">  " selected-string)))
         (if seperator-index
-          (cons
-            (substring selected-string (+ 3 seperator-index))
-            (substring selected-string 0 seperator-index))
+          (let
+            ((selected-pair
+               (cons
+                 (substring selected-string (+ 3 seperator-index))
+                 (substring selected-string 0 seperator-index))))
+            (learn-selected-pair selected-pair)
+            selected-pair)
           (cons selected-string #f)))
       #f)))

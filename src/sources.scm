@@ -20,7 +20,7 @@
 ;       distribution.
 
 (chb-module sources (register-source source-exists? gather-sources)
-  (chb-import base-directories misc)
+  (chb-import base-directories misc ranking)
   (use extras files posix data-structures srfi-1 srfi-69)
 
   ; Associates source names with its informations.
@@ -39,6 +39,13 @@
 
   ; Cached results for source which should only be executed once.
   (define source-cache (make-hash-table))
+
+  ;; If the given source list is empty, it will return a list with all
+  ;; sources available.
+  (define (fallback-source-list source-list)
+    (if (null? source-list)
+      (map car (hash-table->alist source-table))
+      source-list))
 
   ;; Registers a source and errors if it is already registered. It takes
   ;; optional key values as described above in 'source-info'.
@@ -94,8 +101,7 @@
     (if (source-info-async info)
       (let ((cache-file (get-cache-path ".async/" name "/cache")))
         (if (file-exists? cache-file)
-          (begin
-            (define cache-data (read-lines cache-file))
+          (let ((cache-data (read-lines cache-file)))
             (process-fork
               (lambda ()
                 (synced-cache-update
@@ -107,8 +113,26 @@
             (read-lines cache-file))))
       ((source-info-thunk info))))
 
+  ;; A wrapper around 'collect-source-contents', which filters out all
+  ;; items with a score.
+  (define (collect-ranked-source-contents name info)
+    (let ((source-content (collect-source-contents name info))
+          (score-alist (get-score-alist name)))
+      (if score-alist
+        (let ((filter-table (alist->hash-table score-alist)))
+          (filter
+            (lambda (item)
+              (if (hash-table-exists? filter-table item)
+                (begin
+                  (hash-table-delete! filter-table item)
+                  #f)
+                #t))
+            source-content))
+        source-content)))
+
   ;; Returns the content of a source as an alist, which associates each
-  ;; item with its source name. It considers the sources 'once' flag.
+  ;; item with its source name. The returned alist does not contain ranked
+  ;; items. It considers the sources 'once' flag.
   (define (gather-source name)
     (define info (hash-table-ref source-table name))
     (map
@@ -116,20 +140,16 @@
       (if (source-info-once info)
         (if (hash-table-exists? source-cache name)
           (hash-table-ref source-cache name)
-          (begin
-            (define result (collect-source-contents name info))
+          (let ((result (collect-ranked-source-contents name info)))
             (hash-table-set! source-cache name result)
             result))
-        (collect-source-contents name info))))
+        (collect-ranked-source-contents name info))))
 
-  ;; Gathers all informations from the given sources. It takes a list of
-  ;; valid, existing source names as an optional argument. If it is omitted
-  ;; or null, it will return the contents of all available sources.
-  (define (gather-sources #!optional (source-list '()))
-    (define invalid-source
-      (find (complement source-exists?) source-list))
-    (if invalid-source
-      (die "source does not exist: '" invalid-source "'"))
+  ;; Gathers the contents of all sources in the given source list, without
+  ;; scored items. If the list is empty, it will gather all available
+  ;; sources. If the list is not empty, it must contain only valid source
+  ;; names. Duplicates will be ignored.
+  (define (gather-from-source-list source-list)
     (fold
       (lambda (source-name lst)
         (merge
@@ -138,14 +158,50 @@
             (< (string-length (car a))
                (string-length (car b))))))
       '()
-      (if (null? source-list)
-        (map car (hash-table->alist source-table))
-        ; Deduplicate source list.
-        (let ((sorted-list (sort source-list string<?)))
-          (fold
-            (lambda (name lst)
-              (if (string=? name (car lst))
-                lst
-                (cons name lst)))
-            (list (car sorted-list))
-            (cdr sorted-list)))))))
+      ; Iterate over a valid source list.
+      (let ((sorted-list
+              (sort (fallback-source-list source-list) string<?)))
+        (fold
+          (lambda (name lst)
+            (if (string=? name (car lst))
+              lst
+              (cons name lst)))
+          (list (car sorted-list))
+          (cdr sorted-list)))))
+
+  ;; A simple function which compares the scores of two lists.
+  (define (greater-score? a b)
+    (> (car a) (car b)))
+
+  ;; Builds a new alist from the given score list with the given source
+  ;; name and merges it into another. This alist associates a score with a
+  ;; pair containing a string and its source.
+  (define (merge-scored-lists score-alist source-name lst)
+    (merge
+      (sort
+        (map
+          (lambda (score-pair)
+            (cons
+              (cdr score-pair)
+              (cons (car score-pair) source-name)))
+          score-alist)
+        greater-score?)
+      lst greater-score?))
+
+  ;; Gathers all informations from the given sources. It takes a list of
+  ;; valid, existing source names as an optional argument. If it is omitted
+  ;; or null, it will return the contents of all available sources.
+  (define (gather-sources #!optional (source-list '()))
+    (let ((invalid-source (find (complement source-exists?) source-list)))
+      (if invalid-source
+        (die "source does not exist: '" invalid-source "'")))
+    (append
+      (map cdr
+        (fold
+          (lambda (source-name lst)
+            (let ((score-alist (get-score-alist source-name)))
+              (if score-alist
+                (merge-scored-lists score-alist source-name lst)
+                lst)))
+          '() (fallback-source-list source-list)))
+      (gather-from-source-list source-list))))
