@@ -21,4 +21,6 @@
 
 (module dlaunch-plugin-api ()
   (import chicken)
-  (reexport dlaunch-core sources base-directories handler))
+  (reexport
+    dlaunch-core sources base-directories handler
+    (only ranking learn-selected-pair)))

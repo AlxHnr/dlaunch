@@ -21,7 +21,7 @@
 
 (chb-module sources (register-source source-exists? gather-sources)
   (chb-import base-directories misc ranking)
-  (use extras files posix data-structures srfi-1 srfi-69)
+  (use extras files posix ports data-structures srfi-1 srfi-69)
 
   ; Associates source names with its informations.
   (define source-table (make-hash-table))
@@ -88,11 +88,20 @@
           (for-each
             (lambda (item)
               (write-line item out))
-            (source-function))))
+            (reverse (source-function)))))
       (file-move
         (get-cache-path ".async/" name "/.cache")
         (get-cache-path ".async/" name "/cache") #t)
       (close-output-port lock-port)))
+
+  ;; Read lines in reversed order. This is slightly faster than
+  ;; 'read-lines' from extras.
+  (define (read-lines-reversed filename)
+    (call-with-input-file filename
+      (lambda (in)
+        (port-fold
+          cons '()
+          (lambda () (read-line in))))))
 
   ;; Returns the raw contents of a source. If the 'async' flag is set for
   ;; this source, it will return its cache. If no cache is available, it
@@ -101,7 +110,7 @@
     (if (source-info-async info)
       (let ((cache-file (get-cache-path ".async/" name "/cache")))
         (if (file-exists? cache-file)
-          (let ((cache-data (read-lines cache-file)))
+          (let ((cache-data (read-lines-reversed cache-file)))
             (process-fork
               (lambda ()
                 (synced-cache-update
@@ -122,11 +131,12 @@
         (let ((filter-table (alist->hash-table score-alist)))
           (filter
             (lambda (item)
-              (if (hash-table-exists? filter-table item)
-                (begin
-                  (hash-table-delete! filter-table item)
-                  #f)
-                #t))
+              (cond
+                ((zero? (hash-table-size filter-table)) #t)
+                ((hash-table-exists? filter-table item)
+                 (hash-table-delete! filter-table item)
+                 #f)
+                (else #t)))
             source-content))
         source-content)))
 
@@ -158,9 +168,9 @@
             (< (string-length (car a))
                (string-length (car b))))))
       '()
-      ; Iterate over a valid source list.
-      (let ((sorted-list
-              (sort (fallback-source-list source-list) string<?)))
+      ; Deduplicate list of sources.
+      (let
+        ((sorted-list (sort (fallback-source-list source-list) string<?)))
         (fold
           (lambda (name lst)
             (if (string=? name (car lst))

@@ -106,8 +106,9 @@
       (increase-score 0.0)))
 
   ;; Learns the content of the given pair, which must contain two valid
-  ;; strings. It will update the score alist and save it to
-  ;; 'score-file-path'.
+  ;; strings. The first string is the item selected by the user. The second
+  ;; string is the name of its source. It will update the score alist and
+  ;; save it to 'score-file.scm'.
   (define (learn-selected-pair selected-pair)
     (define score-alist
       (assoc (cdr selected-pair) source-score-alist))
