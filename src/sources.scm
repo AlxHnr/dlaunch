@@ -31,14 +31,7 @@
   ;;       a string list.
   ;; async A boolean, which specifies whether a source's result should be
   ;;       cached by a background process for subsequent runs.
-  ;; once  A boolean, which when true will cause all collections of this
-  ;;       source to return the result of its first invocation. This cache
-  ;;       vanishes if Dlaunch terminates and is only useful for plugins
-  ;;       which may gather a source multiple times.
-  (define-record source-info thunk async once)
-
-  ; Cached results for source which should only be executed once.
-  (define source-cache (make-hash-table))
+  (define-record source-info thunk async)
 
   ;; If the given source list is empty, it will return a list with all
   ;; sources available.
@@ -49,7 +42,7 @@
 
   ;; Registers a source and errors if it is already registered. It takes
   ;; optional key values as described above in 'source-info'.
-  (define (register-source name thunk #!key async once)
+  (define (register-source name thunk #!key async)
     (cond
       ((substring-index name ">  ")
        (die "source name cannot contain the '>  ' separator: '" name "'."))
@@ -59,7 +52,7 @@
       (else
         (hash-table-set!
           source-table name
-          (make-source-info thunk async once)))))
+          (make-source-info thunk async)))))
 
   ;; Checks if a source was registered.
   (define (source-exists? name)
@@ -142,18 +135,12 @@
 
   ;; Returns the content of a source as an alist, which associates each
   ;; item with its source name. The returned alist does not contain ranked
-  ;; items. It considers the sources 'once' flag.
+  ;; items.
   (define (gather-source name)
     (define info (hash-table-ref source-table name))
     (map
       (lambda (item) (cons item name))
-      (if (source-info-once info)
-        (if (hash-table-exists? source-cache name)
-          (hash-table-ref source-cache name)
-          (let ((result (collect-ranked-source-contents name info)))
-            (hash-table-set! source-cache name result)
-            result))
-        (collect-ranked-source-contents name info))))
+      (collect-ranked-source-contents name info)))
 
   ;; Gathers the contents of all sources in the given source list, without
   ;; scored items. If the list is empty, it will gather all available
