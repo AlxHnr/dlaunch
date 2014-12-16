@@ -21,7 +21,7 @@
 
 (chb-module ranking (get-score-alist learn-selected-pair)
   (chb-import base-directories)
-  (use extras posix srfi-1 srfi-69)
+  (use extras posix data-structures srfi-1 srfi-69)
 
   ;; The path to the score file.
   (define score-file-path (get-data-path "score-file.scm"))
@@ -110,20 +110,27 @@
   ;; string is the name of its source. It will update the score alist and
   ;; save it to 'score-file.scm'.
   (define (learn-selected-pair selected-pair)
-    (define score-alist
-      (assoc (cdr selected-pair) source-score-alist))
-    (if (not score-alist)
-      (set!
-        source-score-alist
-        (cons
-          (list
-            (cdr selected-pair)
-            (new-score-pair selected-pair))
-          source-score-alist))
-      (let ((score-pair (assoc (car selected-pair) (cdr score-alist))))
-        (if score-pair
-          (set-cdr! score-pair (increase-score (cdr score-pair)))
+    (let ((score-alist (assoc (cdr selected-pair) source-score-alist)))
+      (if (not score-alist)
+        (set!
+          source-score-alist
+          (cons
+            (list
+              (cdr selected-pair)
+              (new-score-pair selected-pair))
+            source-score-alist))
+        (let ((score-pair (assoc (car selected-pair) (cdr score-alist))))
           (set-cdr!
             score-alist
-            (cons (new-score-pair selected-pair) (cdr score-alist))))))
-    (save-score-alist)))
+            (merge
+              (list
+                (if score-pair
+                  (cons (car score-pair) (increase-score (cdr score-pair)))
+                  (new-score-pair selected-pair)))
+              (remove
+                (lambda (pair)
+                  (string=? (car pair) (car selected-pair)))
+                (cdr score-alist))
+              (lambda (a b)
+                (> (cdr a) (cdr b)))))))
+      (save-score-alist))))

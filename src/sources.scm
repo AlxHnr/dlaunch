@@ -179,24 +179,20 @@
           (list (car sorted-list))
           (cdr sorted-list)))))
 
-  ;; A simple function which compares the scores of two lists.
-  (define (greater-score? a b)
-    (> (car a) (car b)))
-
   ;; Builds a new alist from the given score list with the given source
   ;; name and merges it into another. This alist associates a score with a
   ;; pair containing a string and its source.
   (define (merge-scored-lists score-alist source-name lst)
     (merge
-      (sort
-        (map
-          (lambda (score-pair)
-            (cons
-              (cdr score-pair)
-              (cons (car score-pair) source-name)))
-          score-alist)
-        greater-score?)
-      lst greater-score?))
+      (map
+        (lambda (score-pair)
+          (cons
+            (cdr score-pair)
+            (cons (car score-pair) source-name)))
+        score-alist)
+      lst
+      (lambda (a b)
+        (> (car a) (car b)))))
 
   ;; Gathers all informations from the given sources. It takes a list of
   ;; valid, existing source names as an optional argument. If it is omitted
