@@ -34,9 +34,10 @@
 
   ;; Builds a list with dlaunch specific command line arguments for dmenu.
   (define (get-dlaunch-args lst)
-    (list "-l" "10" "-p"
-          (string-append
-            "Dlaunch (" (get-formatted-count lst) " items)")))
+    (list
+      "-l" "10" "-p"
+      (string-append
+        "Dlaunch (" (get-formatted-count lst) " items)")))
 
   ;; Selects a string using dmenu. It takes a procedure, which will be
   ;; called with an output port to write lines to dmenu. It takes two

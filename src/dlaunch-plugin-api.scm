@@ -23,4 +23,5 @@
   (import chicken)
   (reexport
     dlaunch-core sources base-directories handler
-    (only ranking learn-selected-pair)))
+    (only ranking learn-selected-pair)
+    (only misc get-formatted-count)))

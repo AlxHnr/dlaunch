@@ -30,7 +30,7 @@
         (apply print message)))
     (exit 1))
 
-  ;; A pattern for matching numbers without decimal marks.
+  ;; A pattern for matching numbers without the thousands seperator.
   (define pattern (irregex "^(\\d+)(\\d{3})((\\.\\d{3})*)$"))
 
   ;; Returns the formatted count of elements in the given list with the
