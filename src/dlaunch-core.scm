@@ -23,7 +23,7 @@
 
 (chb-module dlaunch-core
   (dlaunch dlaunch-from-list call-with-dmenu-output-pipe)
-  (chb-import base-directories sources ranking)
+  (chb-import base-directories sources ranking misc)
   (use extras posix data-structures srfi-1)
 
   ;; Custom arguments specified by the user in dlaunch's config files.
@@ -34,10 +34,9 @@
 
   ;; Builds a list with dlaunch specific command line arguments for dmenu.
   (define (get-dlaunch-args lst)
-    (let ((list-length (count (constantly #t) lst)))
-      (list "-l" "10" "-p"
-            (string-append
-              "Dlaunch (" (number->string list-length) " items)"))))
+    (list "-l" "10" "-p"
+          (string-append
+            "Dlaunch (" (get-formatted-count lst) " items)")))
 
   ;; Selects a string using dmenu. It takes a procedure, which will be
   ;; called with an output port to write lines to dmenu. It takes two

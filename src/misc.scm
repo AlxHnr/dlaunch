@@ -19,8 +19,8 @@
 ;    3. This notice may not be removed or altered from any source
 ;       distribution.
 
-(chb-module misc (die)
-  (use ports)
+(chb-module misc (die get-formatted-count)
+  (use ports irregex data-structures srfi-1 srfi-13)
 
   ;; Applies print on the given arguments with current output port set to
   ;; stderr, and terminate the program with failure.
@@ -28,4 +28,16 @@
     (with-output-to-port (current-error-port)
       (lambda ()
         (apply print message)))
-    (exit 1)))
+    (exit 1))
+
+  ;; A pattern for matching numbers without decimal marks.
+  (define pattern (irregex "^(\\d+)(\\d{3})((\\.\\d{3})*)$"))
+
+  ;; Returns the formatted count of elements in the given list with the
+  ;; thousands seperator. "1.234" or "98.732.134".
+  (define (get-formatted-count lst)
+    (let replace-num-groups
+      ((str (number->string (count (constantly #t) lst))))
+      (if (irregex-match pattern str)
+        (replace-num-groups (irregex-replace pattern str 1 "." 2 3))
+        str))))

@@ -126,7 +126,10 @@
 
   ;; Pair each item in the given list with the given source name.
   (define (attach-source-name lst source-name)
-    (map (lambda (item) (cons item source-name)) lst))
+    (map
+      (lambda (item)
+        (cons item source-name))
+      lst))
 
   ;; Collects all items from a source and returns two values. The first
   ;; value is a list of unscored pairs, associating items with their
@@ -134,9 +137,8 @@
   ;; items which do not exist in the source at all. If this table is empty,
   ;; the second returned value will be #f.
   (define (get-filtered-source-content source-name info)
-    (let
-      ((source-content (collect-source-contents source-name info))
-       (score-alist (get-score-alist source-name)))
+    (let ((source-content (collect-source-contents source-name info))
+          (score-alist (get-score-alist source-name)))
       (if score-alist
         (let*
           ((filter-table (alist->hash-table score-alist))
@@ -156,11 +158,17 @@
               #f filter-table)))
         (values (attach-source-name source-content source-name) #f))))
 
+  ;; Wraps 'get-filtered-source-content' and takes the source info from
+  ;; 'source-table'.
+  (define (filter-source source-name)
+    (get-filtered-source-content
+      source-name (hash-table-ref source-table source-name)))
+
   ;; Returns all existing, and scored items from a source in form of a
   ;; pair list which may be null. The car of each pair contains its score.
-  ;; The pairs cdr is another pair, containing a item and its source name.
-  ;; 'ignore-table' can either be a hash table containing items to ignore,
-  ;; or #f.
+  ;; The cdr contains another pair, which associates an item with its
+  ;; source name. 'ignore-table' can either be a hash table containing
+  ;; items to ignore, or #f.
   (define (get-existing-score-infos source-name ignore-table)
     (let ((score-alist (get-score-alist source-name)))
       (if score-alist
@@ -176,10 +184,6 @@
               score-alist)
             score-alist))
         '())))
-
-  (define (filter-source source-name)
-    (get-filtered-source-content
-      source-name (hash-table-ref source-table source-name)))
 
   ;; Gathers all informations from the given sources. It takes a list of
   ;; valid, existing source names as an optional argument. If it is omitted
