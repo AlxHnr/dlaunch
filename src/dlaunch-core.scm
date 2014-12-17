@@ -58,15 +58,15 @@
 
   ;; Prompts the user to pick one string from a given list and returns it.
   ;; If the user aborts his selection, it returns #f. This function takes
-  ;; an optional list of arguments for dmenu.
-  (define (dlaunch-from-list lst #!optional (dmenu-args '()))
+  ;; the same optional key values as 'call-with-dmenu-output-pipe'.
+  (define (dlaunch-from-list lst #!key (extra-args '()) (dmenu-args '()))
     (call-with-dmenu-output-pipe
       (lambda (out)
         (for-each
           (lambda (str)
             (write-line str out))
           lst))
-      extra-args: (get-dlaunch-args lst)
+      extra-args: extra-args
       dmenu-args: dmenu-args))
 
   ;; Prompts the user to select a string from the specified sources and
