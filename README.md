@@ -5,7 +5,14 @@ by plugins. It will learn what you use the most and presort the search
 results accordingly. Dlaunch can be extended by plugins written in
 [Scheme](https://en.wikipedia.org/wiki/Scheme_(programming_language)).
 
+Here is how Dlaunch looks. It offers you your favorite commands and files
+from your favorite sources:
+
 ![screenshot.png](https://raw.github.com/AlxHnr/Dlaunch/master/screenshots/dlaunch.png)
+
+Here is a more customized Dlaunch, which searches trough the _home-files_
+source:
+
 ![screenshot-home-files.png](https://raw.github.com/AlxHnr/Dlaunch/master/screenshots/home-files.png)
 
 ## Usage
@@ -18,18 +25,19 @@ After having successfully installed Dlaunch, you can run it by executing
 to dmenu. The only exception are the following arguments, which are handled
 by Dlaunch directly:
 
-**--sources=...**
+`--sources=NAMES`
 
-Specifies in which sources Dlaunch should search. Example:
+Comma separated source names which specify in which sources Dlaunch should
+search. Example:
 
 `dlaunch --sources=home-files,user-cmd`
 
-**--compile**
+``--compile``
 
 Builds all plugins and exits. You don't need to call this manually, since
-Dlaunch will recompile all plugins if they change anyways.
+Dlaunch will recompile all plugins after modification automatically.
 
-**--help**
+``--help``
 
 Shows a short summary about all available commands and exits.
 
@@ -99,7 +107,8 @@ make install
 
 Make sure, that INSTALL\_PREFIX is set before you build Dlaunch. And also
 make sure, that the `bin/` subdirectory in INSTALL\_PREFIX is listed in
-your PATH. Refer to the documentation of your OS for more informations.
+your PATH variable. Refer to the documentation of your OS for more
+informations.
 
 ## Uninstalling Dlaunch
 
@@ -112,22 +121,22 @@ Run `sudo make uninstall` from inside Dlaunch's source directory.
 
 **Local removal**
 
-Ensure that INSTALL\_PREFIX is setup exactly like during the installation.
+Ensure that INSTALL\_PREFIX is setup exactly like during its installation.
 Then run `make uninstall` from Dlaunch's source directory.
 
 ### Wiping Dlaunch's residue from your home directory
 
 Dlaunch and its plugins create various files in your home directory for
-caching, storing settings and such things. To get rid of them, just run:
+caching, storing settings and other things. To get rid of them, just run:
 
 ```sh
-# Wipe dlaunch's cache.
+# Wipe dlaunch's cache:
 rm -rf "$HOME/.cache/dlaunch/"
 
-# Wipe dlaunch's metadata, like scores, rankings, etc.
+# Wipe dlaunch's metadata, scores, rankings, etc:
 rm -rf "$HOME/.local/share/dlaunch/"
 
-# Remove all plugins and configuration associated with dlaunch:
+# Remove all plugins and settings:
 rm -rf "$HOME/.config/dlaunch/"
 ```
 
