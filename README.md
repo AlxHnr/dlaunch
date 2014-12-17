@@ -5,9 +5,6 @@ by plugins. It will learn what you use the most and presort the search
 results accordingly. Dlaunch can be extended by plugins written in
 [Scheme](https://en.wikipedia.org/wiki/Scheme_(programming_language)).
 
-Here is how Dlaunch looks. It offers you your favorite commands and files
-from your favorite sources:
-
 ![screenshot.png](https://raw.github.com/AlxHnr/Dlaunch/master/screenshots/dlaunch.png)
 
 Here is a more customized Dlaunch, which searches trough the _home-files_
@@ -25,19 +22,19 @@ After having successfully installed Dlaunch, you can run it by executing
 to dmenu. The only exception are the following arguments, which are handled
 by Dlaunch directly:
 
-`--sources=NAMES`
+### --sources=NAMES
 
 Comma separated source names which specify in which sources Dlaunch should
 search. Example:
 
 `dlaunch --sources=home-files,user-cmd`
 
-``--compile``
+### --compile
 
 Builds all plugins and exits. You don't need to call this manually, since
 Dlaunch will recompile all plugins after modification automatically.
 
-``--help``
+### --help
 
 Shows a short summary about all available commands and exits.
 
@@ -112,17 +109,13 @@ informations.
 
 ## Uninstalling Dlaunch
 
-Uninstalling is pretty much like installing Dlaunch. Depending on how you
-have installed Dlaunch, you have two options:
+Uninstalling is pretty much like installing Dlaunch. If you have installed
+Dlaunch system wide, simply run `sudo make uninstall` from inside Dlaunch's
+source directory.
 
-**System wide removal**
-
-Run `sudo make uninstall` from inside Dlaunch's source directory.
-
-**Local removal**
-
-Ensure that INSTALL\_PREFIX is setup exactly like during its installation.
-Then run `make uninstall` from Dlaunch's source directory.
+If you have installed Dlaunch locally, you must ensure that INSTALL\_PREFIX
+is setup exactly like during its installation. Then run `make uninstall`
+from Dlaunch's source directory.
 
 ### Wiping Dlaunch's residue from your home directory
 
