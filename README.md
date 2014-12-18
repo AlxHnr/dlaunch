@@ -6,9 +6,7 @@ results accordingly. Dlaunch can be extended by plugins written in Scheme.
 You can find some of my plugins
 [here](https://github.com/AlxHnr/Dlaunch-plugins). If you want to write
 your own plugins, take a look at
-[this tutorial](https://github.com/AlxHnr/Dlaunch/wiki/Writing-Dlaunch-plugins),
-or at the
-[plugin API](https://github.com/AlxHnr/Dlaunch/wiki/The-Dlaunch-plugin-API).
+[this tutorial](https://github.com/AlxHnr/Dlaunch/wiki/Writing-Dlaunch-plugins).
 
 ![screenshot.png](https://raw.github.com/AlxHnr/Dlaunch/master/screenshots/dlaunch.png)
 
@@ -22,10 +20,10 @@ source:
 **Note:** Dlaunch itself doesn't provide any content to search in. For this
 you must install a plugin, which provides a source.
 
-After having successfully installed Dlaunch, you can run it by executing
-`dlaunch` from your shell. All command line arguments are passed directly
-to dmenu. The only exception are the following arguments, which are handled
-by Dlaunch directly:
+After successful [installation](## Requirements and installation) you can
+run it by executing `dlaunch` from your shell. All command line arguments
+are passed directly to dmenu. The only exception are the following
+arguments, which are handled by Dlaunch directly:
 
 ### --sources=NAMES
 
