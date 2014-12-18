@@ -20,10 +20,10 @@ source:
 **Note:** Dlaunch itself doesn't provide any content to search in. For this
 you must install a plugin, which provides a source.
 
-After successful [installation](## Requirements and installation) you can
-run it by executing `dlaunch` from your shell. All command line arguments
-are passed directly to dmenu. The only exception are the following
-arguments, which are handled by Dlaunch directly:
+After successful [installation](#requirements-and-installation) you can run
+it by executing `dlaunch` from your shell. All command line arguments are
+passed directly to dmenu. The only exception are the following arguments,
+which are handled by Dlaunch directly:
 
 ### --sources=NAMES
 
