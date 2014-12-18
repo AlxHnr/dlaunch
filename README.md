@@ -2,8 +2,13 @@
 
 A dmenu wrapper which allows you to search trough various sources provided
 by plugins. It will learn what you use the most and presort the search
-results accordingly. Dlaunch can be extended by plugins written in
-[Scheme](https://en.wikipedia.org/wiki/Scheme_(programming_language)).
+results accordingly. Dlaunch can be extended by plugins written in Scheme.
+You can find some of my plugins
+[here](https://github.com/AlxHnr/Dlaunch-plugins). If you want to write
+your own plugins, take a look at
+[this tutorial](https://github.com/AlxHnr/Dlaunch/wiki/Writing-Dlaunch-plugins),
+or at the
+[plugin API](https://github.com/AlxHnr/Dlaunch/wiki/The-Dlaunch-plugin-API).
 
 ![screenshot.png](https://raw.github.com/AlxHnr/Dlaunch/master/screenshots/dlaunch.png)
 
@@ -63,6 +68,14 @@ Here is an example:
 
 For more informations, see the
 [manpage of dmenu](http://linux.die.net/man/1/dmenu).
+
+## Plugins
+
+Dlaunch can be extended by
+[writing plugins](https://github.com/AlxHnr/Dlaunch/wiki/Writing-Dlaunch-plugins).
+A dlaunch plugin is a simple Scheme script, which will be loaded at
+runtime. To install a plugin, just throw its source file into the plugin
+directory. On most systems this is `~/.config/dlaunch/plugins/`.
 
 ## Requirements and installation
 
