@@ -139,7 +139,8 @@
   (define (get-filtered-source-content source-name info)
     (let ((source-content (collect-source-contents source-name info))
           (score-alist (get-score-alist source-name)))
-      (if score-alist
+      (if (null? score-alist)
+        (values (attach-source-name source-content source-name) #f)
         (let*
           ((filter-table (alist->hash-table score-alist))
            (unscored-items
@@ -155,8 +156,7 @@
           (values
             (attach-source-name unscored-items source-name)
             (if (zero? (hash-table-size filter-table))
-              #f filter-table)))
-        (values (attach-source-name source-content source-name) #f))))
+              #f filter-table))))))
 
   ;; Wraps 'get-filtered-source-content' and takes the source info from
   ;; 'source-table'.
@@ -171,19 +171,17 @@
   ;; items to ignore, or #f.
   (define (get-existing-score-infos source-name ignore-table)
     (let ((score-alist (get-score-alist source-name)))
-      (if score-alist
-        (map
-          (lambda (score-pair)
-            (cons
-              (cdr score-pair)
-              (cons (car score-pair) source-name)))
-          (if ignore-table
-            (remove
-              (lambda (score-pair)
-                (hash-table-exists? ignore-table (car score-pair)))
-              score-alist)
-            score-alist))
-        '())))
+      (map
+        (lambda (score-pair)
+          (cons
+            (cdr score-pair)
+            (cons (car score-pair) source-name)))
+        (if ignore-table
+          (remove
+            (lambda (score-pair)
+              (hash-table-exists? ignore-table (car score-pair)))
+            score-alist)
+          score-alist))))
 
   ;; Gathers all informations from the given sources. It takes a list of
   ;; valid, existing source names as an optional argument. If it is omitted

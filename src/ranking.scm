@@ -92,12 +92,12 @@
             (pretty-print source-scores out))
           source-score-alist))))
 
-  ;; Returns the score alist for the given source. This function returns
-  ;; false if there are no scores.
+  ;; Returns the score alist for the given source. The returned list may be
+  ;; empty, if the source contains no scored items.
   (define (get-score-alist source-name)
     (let ((association (assoc source-name source-score-alist)))
       (if association
-        (cdr association) #f)))
+        (cdr association) '())))
 
   ;; Returns a score pair, containing a string and its initial score.
   (define (new-score-pair selected-pair)
