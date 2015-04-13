@@ -46,8 +46,9 @@ Shows a short summary about all available commands and exits.
 ## Configuring Dlaunch
 
 There isn't much to configure in Dlaunch. The file
-`~/.config/dmenu-args.scm` contains quoted strings, which will be passed to
-dmenu. Please mind that this path may be different on your system.
+`~/.config/dlaunch/dmenu-args.scm` contains quoted strings, which will be
+passed to dmenu. Please mind that this path may be different on your
+system.
 
 Here is an example:
 
