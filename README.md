@@ -83,53 +83,32 @@ directory. On most systems this is `~/.config/dlaunch/plugins/`.
 Dlaunch depends on:
 
 * [CHICKEN Scheme](http://call-cc.org)
+* [chicken-builder](https://github.com/AlxHnr/chicken-builder)
 * [dmenu](http://tools.suckless.org/dmenu/)
 
-To install Dlaunch you must clone this repository first:
+After cloning this repository, you must chdir into it. Now you have two
+options: a system wide, or a local installation.
+
+A **system wide installation** is the default. Dlaunch will be installed to
+`/usr/local`, unless you set *INSTALL_PREFIX* to another path.
+
+For a **local installation** you must set the variable *INSTALL_PREFIX* to
+your local installation path, which is usually `~/.local/`.
+
+Now you can build and install Dlaunch with the following commands:
 
 ```sh
-git clone --recursive https://github.com/AlxHnr/Dlaunch
-```
-
-Now you have two options: You can either install it globally or locally.
-
-**System wide installation**
-
-This is the simpler variant. Just build Dlaunch in its directory and
-install it with these commands:
-
-```sh
-cd Dlaunch/
 make
-sudo make install
+make install # Eventually this command must be executed as root.
 ```
 
-**Local installation**
+Please mind that *INSTALL_PREFIX* must be set before you build Dlaunch.
 
-You need to make sure to set the variable *INSTALL_PREFIX* to your local
-installation directory, which is usually `~/.local/`. Then you can build
-and install it with these commands:
+### Uninstalling Dlaunch
 
-```sh
-cd Dlaunch/
-make
-make install
-```
-
-Make sure, that *INSTALL_PREFIX* is set before you build Dlaunch. And also
-make sure, that the `bin/` subdirectory in *INSTALL_PREFIX* is listed in
-your _PATH_ variable. Refer to the documentation of your OS for more
-informations.
-
-## Uninstalling Dlaunch
-
-Uninstalling is pretty much like installing Dlaunch. If you have installed
-Dlaunch system wide, simply run `sudo make uninstall` from inside Dlaunch's
+First you need to ensure, that *INSTALL_PREFIX* is setup exactly like
+during installation. Then simply run `make uninstall` from inside Dlaunch's
 source directory.
-
-If you have installed Dlaunch locally, you must ensure that
-*INSTALL_PREFIX* is setup exactly like during its installation. Then run
-`make uninstall` from Dlaunch's source directory.
 
 ### Wiping Dlaunch's residue from your home directory
 
