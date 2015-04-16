@@ -89,11 +89,11 @@ Dlaunch depends on:
 After cloning this repository, you must chdir into it. Now you have two
 options: a system wide, or a local installation.
 
-A **system wide installation** is the default. Dlaunch will be installed to
+A system wide installation is the default. Dlaunch will be installed to
 `/usr/local`, unless you set *INSTALL_PREFIX* to another path.
 
-For a **local installation** you must set the variable *INSTALL_PREFIX* to
-your local installation path, which is usually `~/.local/`.
+For a local installation you must set the variable *INSTALL_PREFIX* to your
+local installation path, which is usually `~/.local/`.
 
 Now you can build and install Dlaunch with the following commands:
 
@@ -109,8 +109,6 @@ Please mind that *INSTALL_PREFIX* must be set before you build Dlaunch.
 First you need to ensure, that *INSTALL_PREFIX* is setup exactly like
 during installation. Then simply run `make uninstall` from inside Dlaunch's
 source directory.
-
-#### Wiping Dlaunch's residue from your home directory
 
 Dlaunch and its plugins create various files in your home directory for
 caching, storing settings and other things. To get rid of them, just run:
