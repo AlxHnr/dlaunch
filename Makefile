@@ -4,7 +4,7 @@ PLUGIN_API_PATH = $(INSTALL_PREFIX)/share/dlaunch/plugin-api
 
 -include build/extra.makefile
 build/extra.makefile:
-	csi -s chicken-builder/generate-extra-makefile.scm
+	chicken-builder-init
 
 all: build/dlaunch-plugin-api.import.so
 build/dlaunch-plugin-api.import.so: \
