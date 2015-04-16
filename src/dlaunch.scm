@@ -20,8 +20,8 @@
 ;       distribution.
 
 (chb-program
-  (chb-import dlaunch-core plugin-loader handler)
-  (use data-structures srfi-1 srfi-13)
+  (chb-import dlaunch-core plugin-loader sources handler)
+  (use extras data-structures srfi-1 srfi-13)
 
   (define (print-help)
     (print "Usage: dlaunch [OPTION]...\n"
@@ -58,6 +58,15 @@
 
   (compile-changed-plugins)
   (load-plugins)
+
+  (when (zero? (count-sources))
+    (write-line
+      "dlaunch: no sources for search were registered."
+      (current-error-port))
+    (write-line
+      "dlaunch: you need to install a plugin which provides a source."
+      (current-error-port)))
+
   (define user-selection
     (dlaunch
       sources: specified-sources

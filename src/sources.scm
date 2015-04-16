@@ -19,7 +19,8 @@
 ;    3. This notice may not be removed or altered from any source
 ;       distribution.
 
-(chb-module sources (register-source source-exists? gather-sources)
+(chb-module sources
+  (register-source source-exists? count-sources gather-sources)
   (chb-import base-directories misc ranking)
   (use extras files posix ports data-structures srfi-1 srfi-69)
 
@@ -52,11 +53,15 @@
   (define (source-exists? source-name)
     (hash-table-exists? source-table source-name))
 
+  (define (count-sources)
+    (hash-table-size source-table))
+
   ;; Deduplicates the given source list. If the given list is null, it will
   ;; return a list with all registered sources.
   (define (prepare-source-list source-list)
     (if (null? source-list)
-      (map car (hash-table->alist source-table))
+      (if (zero? (hash-table-size source-table))
+        '() (map car (hash-table->alist source-table)))
       (let ((sorted-list (sort source-list string<?)))
         (fold
           (lambda (source-name lst)
@@ -183,16 +188,11 @@
             score-alist)
           score-alist))))
 
-  ;; Gathers all informations from the given sources. It takes a list of
-  ;; valid, existing source names as an optional argument. If it is omitted
-  ;; or null, it will return the contents of all available sources.
-  (define (gather-sources #!optional (source-list '()))
-    (let ((invalid-source (find (complement source-exists?) source-list)))
-      (if invalid-source
-        (die "source does not exist: '" invalid-source "'")))
-    (let*
-      ((sorted-source-list (prepare-source-list source-list))
-       (final-list-pair
+  ; Takes a deduplicated list of valid, existing source names and returns
+  ; the sorted content of these sources.
+  (define (gather-sources-raw source-list)
+    (let
+      ((final-list-pair
          (fold
            (lambda (source-name list-pair)
              (let-values
@@ -210,12 +210,23 @@
                         (string-length (car b))))))))
            (let*-values
              (((content ignore-table)
-               (filter-source (car sorted-source-list))))
+               (filter-source (car source-list))))
              (cons
                (get-existing-score-infos
-                 (car sorted-source-list) ignore-table)
+                 (car source-list) ignore-table)
                content))
-           (cdr sorted-source-list))))
+           (cdr source-list))))
       (append
         (map cdr (car final-list-pair))
-        (cdr final-list-pair)))))
+        (cdr final-list-pair))))
+
+  ;; Gathers all informations from the given sources. It takes a list of
+  ;; valid, existing source names as an optional argument. If it is omitted
+  ;; or null, it will return the contents of all available sources.
+  (define (gather-sources #!optional (source-list '()))
+    (let ((invalid-source (find (complement source-exists?) source-list)))
+      (if invalid-source
+        (die "source does not exist: '" invalid-source "'")))
+    (let ((final-source-list (prepare-source-list source-list)))
+      (if (null? final-source-list)
+        '() (gather-sources-raw final-source-list)))))
