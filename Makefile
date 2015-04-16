@@ -1,6 +1,6 @@
 CSC_FLAGS   = -O3
 INSTALL_PREFIX ?= /usr/local
-PLUGIN_API_PATH = $(INSTALL_PREFIX)/share/dlaunch/plugin-api
+PLUGIN_API_PATH = $(INSTALL_PREFIX)/lib/dlaunch/plugin-api
 
 -include build/extra.makefile
 build/extra.makefile:
@@ -26,4 +26,4 @@ uninstall:
 	rm "$(INSTALL_PREFIX)/bin/dlaunch"
 	rm -rfv "$(PLUGIN_API_PATH)/"
 	rmdir --ignore-fail-on-non-empty "$(INSTALL_PREFIX)/bin/" \
-	  "$(INSTALL_PREFIX)/share/dlaunch" "$(INSTALL_PREFIX)/share/"
+	  "$(INSTALL_PREFIX)/lib/dlaunch" "$(INSTALL_PREFIX)/lib/"

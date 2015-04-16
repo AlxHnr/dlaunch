@@ -40,7 +40,7 @@
   (define-constant plugin-api-import-path
     (string-append
       (or (get-environment-variable "INSTALL_PREFIX") "/usr/local")
-      "/share/dlaunch/plugin-api/"))
+      "/lib/dlaunch/plugin-api/"))
 
   ;; Calls the given procedure for each plugin with the current working
   ;; directory set to the plugin-api import path. The given procedure takes
