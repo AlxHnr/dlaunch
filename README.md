@@ -110,7 +110,7 @@ First you need to ensure, that *INSTALL_PREFIX* is setup exactly like
 during installation. Then simply run `make uninstall` from inside Dlaunch's
 source directory.
 
-### Wiping Dlaunch's residue from your home directory
+#### Wiping Dlaunch's residue from your home directory
 
 Dlaunch and its plugins create various files in your home directory for
 caching, storing settings and other things. To get rid of them, just run:
