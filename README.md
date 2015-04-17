@@ -17,6 +17,9 @@ source:
 
 ## Requirements and installation
 
+**Note:** Gentoo users can install Dlaunch directly from my
+[overlay](https://github.com/AlxHnr/gentoo-overlay).
+
 Dlaunch depends on:
 
 * [CHICKEN Scheme](http://call-cc.org)
