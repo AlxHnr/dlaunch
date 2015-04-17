@@ -15,6 +15,54 @@ source:
 
 ![screenshot-home-files.png](https://raw.github.com/AlxHnr/Dlaunch/master/screenshots/home-files.png)
 
+## Requirements and installation
+
+Dlaunch depends on:
+
+* [CHICKEN Scheme](http://call-cc.org)
+* [chicken-builder](https://github.com/AlxHnr/chicken-builder)
+* [dmenu](http://tools.suckless.org/dmenu/)
+
+After cloning this repository, you must chdir into it. Now you have two
+options: a system wide, or a local installation.
+
+A system wide installation is the default. Dlaunch will be installed to
+`/usr/local`, unless you set *INSTALL_PREFIX* to another path.
+
+For a local installation you must set the variable *INSTALL_PREFIX* to your
+local installation path, which is usually `~/.local/`.
+
+Now you can build and install Dlaunch with the following commands:
+
+```sh
+make
+make install # Eventually this command must be executed as root.
+```
+
+Please mind that *INSTALL_PREFIX* must be set before you build Dlaunch.
+
+### Uninstalling Dlaunch
+
+First you need to ensure, that *INSTALL_PREFIX* is setup exactly like
+during installation. Then simply run `make uninstall` from inside Dlaunch's
+source directory.
+
+Dlaunch and its plugins create various files in your home directory for
+caching, storing settings and other things. To get rid of them, just run:
+
+```sh
+# Wipe dlaunch's cache:
+rm -rf "$HOME/.cache/dlaunch/"
+
+# Wipe dlaunch's metadata, scores, rankings, etc:
+rm -rf "$HOME/.local/share/dlaunch/"
+
+# Remove all plugins and settings:
+rm -rf "$HOME/.config/dlaunch/"
+```
+
+Please mind that all these paths may differ on your System.
+
 ## Usage
 
 **Note:** Dlaunch itself doesn't provide any content to search in. For this
@@ -77,54 +125,6 @@ Dlaunch can be extended by
 A dlaunch plugin is a simple Scheme script, which will be loaded at
 runtime. To install a plugin, just throw its source file into the plugin
 directory. On most systems this is `~/.config/dlaunch/plugins/`.
-
-## Requirements and installation
-
-Dlaunch depends on:
-
-* [CHICKEN Scheme](http://call-cc.org)
-* [chicken-builder](https://github.com/AlxHnr/chicken-builder)
-* [dmenu](http://tools.suckless.org/dmenu/)
-
-After cloning this repository, you must chdir into it. Now you have two
-options: a system wide, or a local installation.
-
-A system wide installation is the default. Dlaunch will be installed to
-`/usr/local`, unless you set *INSTALL_PREFIX* to another path.
-
-For a local installation you must set the variable *INSTALL_PREFIX* to your
-local installation path, which is usually `~/.local/`.
-
-Now you can build and install Dlaunch with the following commands:
-
-```sh
-make
-make install # Eventually this command must be executed as root.
-```
-
-Please mind that *INSTALL_PREFIX* must be set before you build Dlaunch.
-
-### Uninstalling Dlaunch
-
-First you need to ensure, that *INSTALL_PREFIX* is setup exactly like
-during installation. Then simply run `make uninstall` from inside Dlaunch's
-source directory.
-
-Dlaunch and its plugins create various files in your home directory for
-caching, storing settings and other things. To get rid of them, just run:
-
-```sh
-# Wipe dlaunch's cache:
-rm -rf "$HOME/.cache/dlaunch/"
-
-# Wipe dlaunch's metadata, scores, rankings, etc:
-rm -rf "$HOME/.local/share/dlaunch/"
-
-# Remove all plugins and settings:
-rm -rf "$HOME/.config/dlaunch/"
-```
-
-Please mind that all these paths may differ on your System.
 
 ## License
 
