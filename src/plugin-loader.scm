@@ -99,6 +99,6 @@
       (hash-table-set! loaded-plugins plugin-name #t)
       (print "loaded plugin: " plugin-name)))
 
-  ;; Loads all plugins, which where not loaded already.
+  ;; Loads all plugins, which were not loaded already.
   (define (load-plugins)
     (for-each-plugin-with-chdir load-plugin)))

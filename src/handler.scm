@@ -20,7 +20,6 @@
 ;       distribution.
 
 (chb-module handler (register-handler apply-handler)
-  (use srfi-69)
 
   ;; A list, containing all handler procedures.
   (define handler-procs '())
