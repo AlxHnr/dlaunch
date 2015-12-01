@@ -84,10 +84,10 @@
   ;; arguments. If 'wait' is true, it will wait for running background
   ;; processes to terminate.
   (define (synced-cache-update source-name source-function wait)
-    (create-directory (get-cache-path ".async/" source-name) #t)
+    (create-directory (get-cache-path "async-cache/" source-name) #t)
     (define lock-port
       (open-output-file
-        (get-cache-path ".async/" source-name "/lockfile")))
+        (get-cache-path "async-cache/" source-name "/lockfile")))
     (define lock
       (condition-case
         (file-lock lock-port)
@@ -98,15 +98,15 @@
          #f)))
     (when lock
       (call-with-output-file
-        (get-cache-path ".async/" source-name "/.cache")
+        (get-cache-path "async-cache/" source-name "/.cache")
         (lambda (out)
           (for-each
             (lambda (item)
               (write-line item out))
             (reverse (source-function)))))
       (file-move
-        (get-cache-path ".async/" source-name "/.cache")
-        (get-cache-path ".async/" source-name "/cache") #t)
+        (get-cache-path "async-cache/" source-name "/.cache")
+        (get-cache-path "async-cache/" source-name "/cache") #t)
       (close-output-port lock-port)))
 
   ;; Returns the raw contents of a source. If the 'async' flag is set for
