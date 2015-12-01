@@ -27,14 +27,21 @@
   (define loaded-plugins (make-hash-table))
 
   ;; The full path to the file containing compilation informations.
-  (define build-data-file (get-cache-path "compiled-plugins.scm"))
+  (define build-data-file (get-cache-path "plugin-info.scm"))
 
-  ;; A hash table, which associates plugin names with the last modification
-  ;; time of the corresponding plugin.
-  (define build-data
-    (if (file-exists? build-data-file)
-      (alist->hash-table (car (read-file build-data-file)))
-      (make-hash-table)))
+  (if (file-exists? build-data-file)
+    (begin
+      (define build-data-raw (read-file build-data-file))
+
+      ;; The chicken version against which the user plugins where linked.
+      (define chicken-plugin-version (car build-data-raw))
+
+      ;; A hash table, which associates plugin names with the last modification
+      ;; time of the corresponding plugin.
+      (define build-data (alist->hash-table (cadr build-data-raw))))
+    (begin
+      (define chicken-plugin-version "0.0")
+      (define build-data (make-hash-table))))
 
   ;; The directory path to the plugin-api import libraries.
   (define-constant plugin-api-import-path
@@ -87,7 +94,8 @@
   (define (update-compiled-plugin plugin-name source-file output-file)
     (define curr-time (vector-ref (file-stat source-file) 8))
     (define prev-time (hash-table-ref/default build-data plugin-name 0))
-    (unless (and (file-exists? output-file) (= prev-time curr-time))
+    (unless (and (file-exists? output-file) (= prev-time curr-time)
+                 (string=? (chicken-version) chicken-plugin-version))
       (print "compiling plugin: " plugin-name " ...")
       (if (compile-scheme-file plugin-name source-file output-file)
         (hash-table-set! build-data plugin-name curr-time)
@@ -102,6 +110,7 @@
     (call-with-output-file
       build-data-file
       (lambda (out)
+        (write (chicken-version) out)
         (write (hash-table->alist build-data) out))))
 
   ;; Loads a plugin if it was not loaded already.
