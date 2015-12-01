@@ -48,33 +48,30 @@
       (or (get-environment-variable "INSTALL_PREFIX") "/usr/local")
       "/lib/dlaunch/plugins/"))
 
-  ;; Executes the given thunk in the specified directory.
-  (define-syntax call-in-directory
+  ;; Runs the given code with the cwd set ot the plugin api import path.
+  (define-syntax run-in-plugin-api-import-path
     (syntax-rules ()
-      ((_ path thunk ...)
+      ((_ body ...)
        (let ((pwd (current-directory)))
-         (change-directory path)
-         thunk ...
+         (change-directory plugin-api-import-path)
+         body ...
          (change-directory pwd)))))
 
-  ;; Calls the given procedure for each plugin with the current working
-  ;; directory set to the plugin-api import path. The given procedure takes
-  ;; three arguments: the plugin name, the full path to its source file and
-  ;; the full path to its output file.
-  (define (for-each-plugin-with-chdir proc)
-    (call-in-directory
-      plugin-api-import-path
-      (for-each
-        (lambda (filename)
-          (proc
-            (pathname-file filename)
-            (get-config-path "plugins/" filename)
-            (get-cache-path "plugins/" (pathname-file filename) ".so")))
-        (if (directory-exists? (get-config-path "plugins/"))
-          (filter
-            (lambda (filename) (string-suffix-ci? ".scm" filename))
-            (directory (get-config-path "plugins/")))
-          '()))))
+  ;; Calls the given procedure for each user plugin. The given procedure
+  ;; takes three arguments: the plugin name, the full path to its source
+  ;; file and the full path to its output file.
+  (define (for-each-user-plugin proc)
+    (for-each
+      (lambda (filename)
+        (proc
+          (pathname-file filename)
+          (get-config-path "plugins/" filename)
+          (get-cache-path "plugins/" (pathname-file filename) ".so")))
+      (if (directory-exists? (get-config-path "plugins/"))
+        (filter
+          (lambda (filename) (string-suffix-ci? ".scm" filename))
+          (directory (get-config-path "plugins/")))
+        '())))
 
   ;; Compiles a scheme file for dynamic loading.
   (define (compile-scheme-file plugin-name source-file output-file)
@@ -100,7 +97,8 @@
   ;; since their last compilation.
   (define (compile-changed-plugins)
     (create-directory (get-cache-path "plugins/") #t)
-    (for-each-plugin-with-chdir update-compiled-plugin)
+    (run-in-plugin-api-import-path
+      (for-each-user-plugin update-compiled-plugin))
     (call-with-output-file
       build-data-file
       (lambda (out)
@@ -115,13 +113,14 @@
 
   ;; Loads all plugins, which were not loaded already.
   (define (load-plugins)
-    ; Load pre-compiled system plugins first.
-    (when (directory-exists? precompiled-plugin-path)
-      (for-each
-        (lambda (plugin)
-          (load-plugin
-            (pathname-file plugin) 'ignore
-            (string-append precompiled-plugin-path plugin)))
-        (directory precompiled-plugin-path)))
-    ; Load user plugins.
-    (for-each-plugin-with-chdir load-plugin)))
+    (run-in-plugin-api-import-path
+      ; Load pre-compiled plugins first.
+      (when (directory-exists? precompiled-plugin-path)
+        (for-each
+          (lambda (plugin)
+            (load-plugin
+              (pathname-file plugin) 'ignore
+              (string-append precompiled-plugin-path plugin)))
+          (directory precompiled-plugin-path)))
+      ; Load user plugins.
+      (for-each-user-plugin load-plugin))))
