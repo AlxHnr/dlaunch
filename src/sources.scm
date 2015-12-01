@@ -114,7 +114,8 @@
   ;; will create one and block until its done.
   (define (collect-source-contents source-name info)
     (if (source-info-async info)
-      (let ((cache-file (get-cache-path ".async/" source-name "/cache")))
+      (let
+        ((cache-file (get-cache-path "async-cache/" source-name "/cache")))
         (if (file-exists? cache-file)
           (let ((cache-data (read-lines-reversed cache-file)))
             (process-fork
