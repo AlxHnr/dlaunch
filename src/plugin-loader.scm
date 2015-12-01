@@ -42,13 +42,28 @@
       (or (get-environment-variable "INSTALL_PREFIX") "/usr/local")
       "/lib/dlaunch/plugin-api/"))
 
+  ;; The directory where precompiled plugins can be stored.
+  (define-constant precompiled-plugin-path
+    (string-append
+      (or (get-environment-variable "INSTALL_PREFIX") "/usr/local")
+      "/lib/dlaunch/plugins/"))
+
+  ;; Executes the given thunk in the specified directory.
+  (define-syntax call-in-directory
+    (syntax-rules ()
+      ((_ path thunk ...)
+       (let ((pwd (current-directory)))
+         (change-directory path)
+         thunk ...
+         (change-directory pwd)))))
+
   ;; Calls the given procedure for each plugin with the current working
   ;; directory set to the plugin-api import path. The given procedure takes
   ;; three arguments: the plugin name, the full path to its source file and
   ;; the full path to its output file.
   (define (for-each-plugin-with-chdir proc)
-    (let ((pwd (current-directory)))
-      (change-directory plugin-api-import-path)
+    (call-in-directory
+      plugin-api-import-path
       (for-each
         (lambda (filename)
           (proc
@@ -59,8 +74,7 @@
           (filter
             (lambda (filename) (string-suffix-ci? ".scm" filename))
             (directory (get-config-path "plugins/")))
-          '()))
-      (change-directory pwd)))
+          '()))))
 
   ;; Compiles a scheme file for dynamic loading.
   (define (compile-scheme-file plugin-name source-file output-file)
@@ -93,7 +107,7 @@
         (write (hash-table->alist build-data) out))))
 
   ;; Loads a plugin if it was not loaded already.
-  (define (load-plugin plugin-name source-file output-file)
+  (define (load-plugin plugin-name ignore output-file)
     (unless (hash-table-exists? loaded-plugins plugin-name)
       (load-library (string->symbol plugin-name) output-file)
       (hash-table-set! loaded-plugins plugin-name #t)
@@ -101,4 +115,13 @@
 
   ;; Loads all plugins, which were not loaded already.
   (define (load-plugins)
+    ; Load pre-compiled system plugins first.
+    (when (directory-exists? precompiled-plugin-path)
+      (for-each
+        (lambda (plugin)
+          (load-plugin
+            (pathname-file plugin) 'ignore
+            (string-append precompiled-plugin-path plugin)))
+        (directory precompiled-plugin-path)))
+    ; Load user plugins.
     (for-each-plugin-with-chdir load-plugin)))
